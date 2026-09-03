@@ -15,8 +15,13 @@ import json
 import os
 import sys
 
-NODE = "/Users/jungod/.workbuddy/binaries/node/versions/22.22.2/bin/node"
-AUTOMAAT_SERVER = "/Users/jungod/repositories/lightroom-mcp-automaat/server/dist/index.js"
+# Paths are overridable via env; defaults assume `node` on PATH and a local
+# clone of automaat/lightroom-mcp. Example:
+#   LRMCP_NODE=/usr/local/bin/node LRMCP_AUTOMAAT_SERVER=~/path/dist/index.js python demo1...
+NODE = os.environ.get("LRMCP_NODE", "node")
+AUTOMAAT_SERVER = os.environ.get(
+    "LRMCP_AUTOMAAT_SERVER",
+    os.path.expanduser("~/repositories/lightroom-mcp-automaat/server/dist/index.js"))
 HERE = os.path.dirname(os.path.abspath(__file__))
 SERVER_DIR = os.path.abspath(os.path.join(HERE, "..", "server"))
 ANALYSIS_PY = os.path.join(SERVER_DIR, ".venv", "bin", "python")

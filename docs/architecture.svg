@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 470" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#57606a"/>
+    </marker>
+  </defs>
+
+  <rect width="860" height="470" fill="#ffffff"/>
+
+  <!-- AI Client -->
+  <rect x="60" y="24" width="740" height="52" rx="10" fill="#f6f8fa" stroke="#d0d7de" stroke-width="1.5"/>
+  <text x="430" y="46" text-anchor="middle" font-size="15" font-weight="600" fill="#24292f">AI Client</text>
+  <text x="430" y="64" text-anchor="middle" font-size="11.5" fill="#57606a">any MCP client — Claude Desktop · Claude Code · Cursor · VS Code · WorkBuddy · …</text>
+
+  <!-- Transport Layer -->
+  <rect x="60" y="128" width="360" height="128" rx="10" fill="#ffffff" stroke="#d0d7de" stroke-width="1.5"/>
+  <rect x="60" y="128" width="360" height="34" rx="10" fill="#f6f8fa"/>
+  <rect x="60" y="150" width="360" height="12" fill="#f6f8fa"/>
+  <text x="240" y="150" text-anchor="middle" font-size="13" font-weight="700" fill="#24292f">Transport Layer</text>
+  <text x="240" y="164" text-anchor="middle" font-size="10" fill="#0969da" font-weight="600">3rd-party · automaat/lightroom-mcp</text>
+  <text x="80" y="190" font-size="11.5" fill="#24292f">• photo &amp; catalog read / write</text>
+  <text x="80" y="210" font-size="11.5" fill="#24292f">• export JPEG render</text>
+  <text x="80" y="230" font-size="11.5" fill="#24292f">• presets · snapshots · undo</text>
+  <text x="240" y="250" text-anchor="middle" font-size="10" fill="#57606a">MCP server (Node.js) + LrC Lua plugin</text>
+
+  <!-- Analysis Layer -->
+  <rect x="440" y="128" width="360" height="128" rx="10" fill="#ffffff" stroke="#0969da" stroke-width="2"/>
+  <rect x="440" y="128" width="360" height="34" rx="10" fill="#ddf4ff"/>
+  <rect x="440" y="150" width="360" height="12" fill="#ddf4ff"/>
+  <text x="620" y="150" text-anchor="middle" font-size="13" font-weight="700" fill="#24292f">Analysis Layer</text>
+  <text x="620" y="164" text-anchor="middle" font-size="10" fill="#0969da" font-weight="600">this repo · lightroom-agent · self-built</text>
+  <text x="460" y="190" font-size="11.5" fill="#24292f">• analyze_photo — histogram · zones · color cast</text>
+  <text x="460" y="210" font-size="11.5" fill="#24292f">• batch_analyze — consistency scan</text>
+  <text x="460" y="230" font-size="11.5" fill="#24292f">• rule-based suggestions (verifiable)</text>
+  <text x="620" y="250" text-anchor="middle" font-size="10" fill="#57606a">MCP server (Python · numpy)</text>
+
+  <!-- Lightroom -->
+  <rect x="60" y="356" width="360" height="84" rx="10" fill="#ffffff" stroke="#d0d7de" stroke-width="1.5"/>
+  <text x="240" y="390" text-anchor="middle" font-size="14" font-weight="700" fill="#24292f">Adobe Lightroom Classic</text>
+  <text x="240" y="410" text-anchor="middle" font-size="11" fill="#57606a">LrC plugin: LightroomMCP (Start Server)</text>
+  <text x="240" y="428" text-anchor="middle" font-size="10" fill="#57606a">LrSocket :58763 request · :58764 response</text>
+
+  <!-- Local Analysis Engine -->
+  <rect x="440" y="356" width="360" height="84" rx="10" fill="#ffffff" stroke="#0969da" stroke-width="2"/>
+  <text x="620" y="390" text-anchor="middle" font-size="14" font-weight="700" fill="#24292f">Local Analysis Engine</text>
+  <text x="620" y="410" text-anchor="middle" font-size="11" fill="#57606a">runs offline on exported renders</text>
+  <text x="620" y="428" text-anchor="middle" font-size="10" fill="#57606a">no Lightroom connection required</text>
+
+  <!-- Arrows -->
+  <line x1="240" y1="256" x2="240" y2="352" stroke="#57606a" stroke-width="1.5" marker-end="url(#arr)"/>
+  <text x="248" y="300" font-size="10.5" fill="#57606a">MCP over LrSocket</text>
+
+  <line x1="420" y1="398" x2="436" y2="398" stroke="#57606a" stroke-width="1.5" marker-end="url(#arr)"/>
+  <text x="428" y="386" text-anchor="middle" font-size="10.5" fill="#57606a">exported render</text>
+
+  <line x1="620" y1="256" x2="620" y2="352" stroke="#0969da" stroke-width="1.5" marker-end="url(#arr)"/>
+  <text x="628" y="300" font-size="10.5" fill="#57606a">analyze_photo(path)</text>
+
+  <!-- client -> layers -->
+  <line x1="240" y1="76" x2="240" y2="124" stroke="#57606a" stroke-width="1.5" marker-end="url(#arr)"/>
+  <line x1="620" y1="76" x2="620" y2="124" stroke="#57606a" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- footer note -->
+  <text x="60" y="462" font-size="10" fill="#8c959f">Analysis and transport are independent MCP servers — the analysis layer works offline once a render exists.</text>
+</svg>
