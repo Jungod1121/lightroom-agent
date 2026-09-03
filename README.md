@@ -2,32 +2,45 @@
 
 # Lightroom Agent
 
-**Give AI agents eyes for Lightroom — verifiable photo analysis, not guesswork.**
+**See the photo, write Lightroom, show the result — numbers you can check.**
 
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.11%2B-blue)](https://www.python.org)
 [![MCP](https://img.shields.io/badge/protocol-MCP-green)](https://modelcontextprotocol.io)
-[![GitHub](https://img.shields.io/github/stars/Jungod1121/lightroom-agent?style=flat)](https://github.com/Jungod1121/lightroom-agent/stargazers)
+
+[Features](#features) · [Install](#installation) · [Usage](#usage) · [Knowledge](docs/knowledge/README.md) · [Limitations](#honest-limitations)
 
 </div>
 
----
+Third-party Lightroom MCPs can move sliders. They cannot tell whether the sky is clipping, whether `CropTop` on a portrait RAW is actually the left edge, or how far this harbor is from a reference JPEG you dropped in chat.
 
-Existing Lightroom MCP servers (e.g. [automaat/lightroom-mcp](https://github.com/automaat/lightroom-mcp)) can *operate* Lightroom — read settings, apply presets, export, undo — but they are **blind**: they never tell you whether an image is overexposed, which channel is clipping, or which photo in a batch is tonally off.
+This repo is the **eyes + hands + a small style mapper** for an agent sitting in Lightroom Classic:
 
-**Lightroom Agent is the analysis layer.** It turns a rendered photo into verifiable numbers — histogram, Adams 11 zones, 5×5 zone-metering grid, color cast, dynamic range — and emits actionable, checkable suggestions. Combined with a transport layer, an agent can run the full loop **see → judge → adjust → verify** without a human watching the screen.
+1. Export the current photo and **look** (vision if the model can see; histogram if it cannot).
+2. Write allowlisted develop settings (basic panel, HSL, point curve, standard-ratio crop).
+3. Export again and **show** the after. Undo is a snapshot, not LrC history.
 
 <p align="center">
-  <img src="docs/architecture.svg" alt="architecture" width="760">
+  <img src="docs/architecture.svg" alt="architecture" width="820">
 </p>
 
 ## Features
 
-- 🔍 **`analyze_photo`** — per-channel (R/G/B/Lum) histogram & stats, highlight/shadow clipping, Adams 11-zone exposure distribution, 5×5 metering grid, color cast, effective dynamic range (EV), rule-based suggestions
-- 📊 **`batch_analyze`** — scan a directory of renders, flag tonal outliers, check batch consistency
-- 🧮 **Self-built algorithms** — pure numpy vectorization, no third-party analysis libraries
-- 🔌 **Standalone** — pure Python MCP server; works offline once a render exists
-- ✅ **No hallucinated vision** — every output is a number you can verify
+- **`analyze_photo` / `batch_analyze`** — R/G/B/Lum stats, clip, Adams 11 zones, 5×5 grid, color cast, EV range
+- **`prepare_retouch_photo` → `apply_retouch_photo` → `restore_retouch_photo`** — look first, then write, then show
+- **`propose_style_match_photo`** — fingerprint current vs a reference JPEG, emit a develop prescription (does not write)
+- **Crop** — visual sides mapped through orientation (`DA` portrait NEF); only `1:1` `2:3` `3:2` `3:4` `4:3` `4:5` `16:9` `9:16`
+- **Point curves** — `ToneCurvePV2012` 0–255 pairs
+- **Direct plugin CLI** — `scripts/lr-plugin-call.mjs` (no python MCP SDK, no WorkBuddy `oneOf`)
+
+## Requirements
+
+| | |
+|---|---|
+| OS | macOS (Lightroom Classic + this plugin path) |
+| Lightroom | Classic, plugin **Start Server**, sockets `:58763/:58764` **free** (disconnect WorkBuddy’s automaat connector) |
+| Runtime | Python 3.11+, Node 18+ |
+| GPU | None. Analysis is numpy on an 8-bit JPEG |
 
 ## Installation
 
@@ -38,7 +51,7 @@ python3 -m venv .venv
 ./.venv/bin/pip install -r requirements.txt
 ```
 
-Register the MCP server in your client (Claude Desktop, Claude Code, Cursor, VS Code, WorkBuddy, …):
+MCP client config:
 
 ```json
 {
@@ -52,66 +65,76 @@ Register the MCP server in your client (Claude Desktop, Claude Code, Cursor, VS 
 }
 ```
 
-## Quick start
+Set `LRMCP_AUTOMAAT_DIST` to automaat’s `server/dist` if it is not `~/repositories/lightroom-mcp-automaat/server/dist`.
 
-Or skip MCP entirely and call the analyzer directly:
+## Usage
+
+**Analyze a JPEG (no Lightroom):**
 
 ```bash
-$ cd lightroom-agent/server
-$ ./.venv/bin/python -c "
+cd lightroom-agent/server
+./.venv/bin/python -c "
 from lightroom_agent.analysis.histogram import analyze
-r = analyze('photo.jpg')
-print(r.to_dict()['suggestions'])
+print(analyze('photo.jpg').to_dict()['statistics']['Lum'])
 "
-['overall cool-toned (R-G delta -42.3): adjust temperature unless intended',
- 'overall dark (mean 81.3): consider Exposure +0.2~0.4']
 ```
 
-With a transport layer installed (see [automaat/lightroom-mcp](https://github.com/automaat/lightroom-mcp)), the full loop runs inside one conversation:
+**Retouch loop** ([`skills/lightroom-retouch/SKILL.md`](skills/lightroom-retouch/SKILL.md)):
 
 ```
-get_selected_photos → export JPEG → analyze_photo → adjust_develop_settings
-→ re-export → analyze again (clipping fixed?)
+get_selected_photos
+→ prepare_retouch_photo          # export + snapshot, no catalog write
+→ READ jpeg_path
+→ apply_retouch_photo(settings)  # allowlisted develop + crop
+→ SHOW after_path
 ```
 
-Runnable scripts live in [`scripts/`](scripts/):
+**Match a reference still:**
+
+```
+propose_style_match_photo(photo_id, "/path/to/reference.jpg")
+→ look at both pictures
+→ apply_retouch_photo(returned settings, plus a 2:3 / 3:4 window if cropping)
+```
+
+Do **not** call `adjust_develop_settings` (automaat 0.13 has no such tool).
 
 ```bash
-scripts/demo1_diagnose.py   # single-photo diagnose loop (needs LrC + transport layer)
-scripts/demo2_batch.py      # batch consistency scan (offline)
-scripts/demo3_verify.py     # before/after verification with auto-undo
+node scripts/lr-plugin-call.mjs ping
+node scripts/lr-plugin-call.mjs get_photo_metadata '{"photo_id":"7007"}'
+cd server && ./.venv/bin/python -m unittest discover -s tests
 ```
 
-## Output reference
+## What changed vs the original repo
 
-| Field | Meaning |
+| Then | Now |
 |---|---|
-| `statistics` | per-channel mean / median / highlight & shadow clipping % / peak bin |
-| `bins64` | 64-bin histogram per channel |
-| `zones_pct` | Adams 11-zone pixel distribution |
-| `grid5_lum` | 5×5 grid luminance means (composition lighting) |
-| `color_cast` | mid-gray R/G/B deltas (cast evidence) |
-| `range_ev` | effective dynamic range (p2–p98, EV) |
-| `suggestions` | rule-based, actionable items |
+| Analysis MCP only; “no Lightroom operation logic” | prepare / apply / restore write develop through the plugin |
+| Python `gateway_daemon` (never connected) | **Deprecated.** Node CLI talks NDJSON to LrSocket |
+| `adjust_develop_settings` in demos (does not exist) | `set_develop_settings` + allowlist |
+| Crop = raw `CropTop` | Orientation-aware visual crop; standard ratios only |
+| No curves | `ToneCurvePV2012` |
+| Roadmap: “style fingerprinting” | `propose_style_match_photo` from a **user** reference JPEG |
+| Zero tests | unittest: histogram, prescription, crop, style gap, loop |
 
 ## Honest limitations
 
-Analysis on deliberately-styled images (teal & orange, B&W) produces **false-positive suggestions** — cross-check against develop parameters before acting. Inputs are 8-bit renders (same pipeline as the LrC UI histogram, slightly different bit depth). This repo deliberately contains **no** Lightroom operation logic — that belongs to the transport layer.
+- LrSocket is **1:1**. If WorkBuddy holds automaat, this CLI cannot connect.
+- Style match moves global tone/color toward the reference. It will not copy composition, boats, or skyline. Amplitude still needs a look.
+- Histogram `suggestions` misfire on night/teal looks — evidence, not a prescription.
+- No masks, no calibration, no downloaded “master photo” corpus (copyright + wrong photographer).
+- `demo1_diagnose.py` / `demo3_verify.py` still use the dead python MCP client.
 
-## Research archive
+## Documentation
 
-[`archive/`](archive/README.md) documents our attempt to build the transport layer from scratch — 9 hard-won lessons about LrSocket (sandbox limitations, ghost connections, rebind races). Read it before touching Lightroom plugin sockets.
-
-## Roadmap
-
-- [ ] Region histograms (mask / crop aware)
-- [ ] Style fingerprinting & clustering from reference images
-- [ ] Before/after verification reports
-- [ ] Auto-culling scoring engine
+- [Architecture](docs/architecture.svg)
+- [Knowledge: tone, curves, crop, style](docs/knowledge/README.md)
+- [Gateway status (deprecated python path)](docs/gateway-status.md)
+- [LrSocket archive](archive/README.md)
 
 ## Contributing
 
-Issues and PRs are welcome.
+Issues and PRs welcome. Run `python -m unittest discover -s tests` from `server/`.
 
 ## License
 

@@ -1,4 +1,11 @@
-"""gateway_daemon.py — Lightroom Gateway 守护进程（自研）
+"""DEPRECATED — python MCP SDK × automaat 会掐 stdin，此 daemon 起不来。
+
+修图走 scripts/lr-plugin-call.mjs + lightroom_agent.retouch.loop。
+不要再修这个文件去连 automaat。
+
+---
+
+gateway_daemon.py — Lightroom Gateway 守护进程（自研）
 
 唯一持有 automaat 连接（单实例锁）的常驻进程，对多个客户端提供 TCP line-JSON 入口。
 连接由单例后台任务维护（生命周期不跨任务，避免 anyio cancel-scope 竞态），

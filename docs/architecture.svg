@@ -1,65 +1,64 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 470" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 560" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
   <defs>
     <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M 0 0 L 10 5 L 0 10 z" fill="#57606a"/>
     </marker>
   </defs>
+  <rect width="920" height="560" fill="#ffffff"/>
 
-  <rect width="860" height="470" fill="#ffffff"/>
+  <rect x="40" y="20" width="840" height="56" rx="10" fill="#f6f8fa" stroke="#d0d7de" stroke-width="1.5"/>
+  <text x="460" y="44" text-anchor="middle" font-size="15" font-weight="600" fill="#24292f">Agent session (Grok / WorkBuddy / …)</text>
+  <text x="460" y="62" text-anchor="middle" font-size="11" fill="#57606a">look at JPEG first → judge (or match a reference) → apply → show after</text>
 
-  <!-- AI Client -->
-  <rect x="60" y="24" width="740" height="52" rx="10" fill="#f6f8fa" stroke="#d0d7de" stroke-width="1.5"/>
-  <text x="430" y="46" text-anchor="middle" font-size="15" font-weight="600" fill="#24292f">AI Client</text>
-  <text x="430" y="64" text-anchor="middle" font-size="11.5" fill="#57606a">any MCP client — Claude Desktop · Claude Code · Cursor · VS Code · WorkBuddy · …</text>
+  <rect x="40" y="108" width="840" height="196" rx="10" fill="#ffffff" stroke="#0969da" stroke-width="2"/>
+  <rect x="40" y="108" width="840" height="32" rx="10" fill="#ddf4ff"/>
+  <rect x="40" y="128" width="840" height="12" fill="#ddf4ff"/>
+  <text x="460" y="130" text-anchor="middle" font-size="13" font-weight="700" fill="#24292f">this repo · lightroom-agent</text>
 
-  <!-- Transport Layer -->
-  <rect x="60" y="128" width="360" height="128" rx="10" fill="#ffffff" stroke="#d0d7de" stroke-width="1.5"/>
-  <rect x="60" y="128" width="360" height="34" rx="10" fill="#f6f8fa"/>
-  <rect x="60" y="150" width="360" height="12" fill="#f6f8fa"/>
-  <text x="240" y="150" text-anchor="middle" font-size="13" font-weight="700" fill="#24292f">Transport Layer</text>
-  <text x="240" y="164" text-anchor="middle" font-size="10" fill="#0969da" font-weight="600">3rd-party · automaat/lightroom-mcp</text>
-  <text x="80" y="190" font-size="11.5" fill="#24292f">• photo &amp; catalog read / write</text>
-  <text x="80" y="210" font-size="11.5" fill="#24292f">• export JPEG render</text>
-  <text x="80" y="230" font-size="11.5" fill="#24292f">• presets · snapshots · undo</text>
-  <text x="240" y="250" text-anchor="middle" font-size="10" fill="#57606a">MCP server (Node.js) + LrC Lua plugin</text>
+  <rect x="60" y="156" width="190" height="128" rx="8" fill="#f6f8fa" stroke="#d0d7de"/>
+  <text x="155" y="180" text-anchor="middle" font-size="12" font-weight="600" fill="#24292f">Analysis</text>
+  <text x="70" y="204" font-size="11" fill="#24292f">histogram · 11 zones</text>
+  <text x="70" y="222" font-size="11" fill="#24292f">5×5 grid · color cast</text>
+  <text x="70" y="240" font-size="11" fill="#24292f">EV range</text>
+  <text x="155" y="268" text-anchor="middle" font-size="10" fill="#57606a">numpy · offline OK</text>
 
-  <!-- Analysis Layer -->
-  <rect x="440" y="128" width="360" height="128" rx="10" fill="#ffffff" stroke="#0969da" stroke-width="2"/>
-  <rect x="440" y="128" width="360" height="34" rx="10" fill="#ddf4ff"/>
-  <rect x="440" y="150" width="360" height="12" fill="#ddf4ff"/>
-  <text x="620" y="150" text-anchor="middle" font-size="13" font-weight="700" fill="#24292f">Analysis Layer</text>
-  <text x="620" y="164" text-anchor="middle" font-size="10" fill="#0969da" font-weight="600">this repo · lightroom-agent · self-built</text>
-  <text x="460" y="190" font-size="11.5" fill="#24292f">• analyze_photo — histogram · zones · color cast</text>
-  <text x="460" y="210" font-size="11.5" fill="#24292f">• batch_analyze — consistency scan</text>
-  <text x="460" y="230" font-size="11.5" fill="#24292f">• rule-based suggestions (verifiable)</text>
-  <text x="620" y="250" text-anchor="middle" font-size="10" fill="#57606a">MCP server (Python · numpy)</text>
+  <rect x="266" y="156" width="190" height="128" rx="8" fill="#f6f8fa" stroke="#d0d7de"/>
+  <text x="361" y="180" text-anchor="middle" font-size="12" font-weight="600" fill="#24292f">Retouch loop</text>
+  <text x="276" y="204" font-size="11" fill="#24292f">prepare · apply · restore</text>
+  <text x="276" y="222" font-size="11" fill="#24292f">allowlist + snapshots</text>
+  <text x="276" y="240" font-size="11" fill="#24292f">point curves</text>
+  <text x="361" y="268" text-anchor="middle" font-size="10" fill="#57606a">writes LrC develop</text>
 
-  <!-- Lightroom -->
-  <rect x="60" y="356" width="360" height="84" rx="10" fill="#ffffff" stroke="#d0d7de" stroke-width="1.5"/>
-  <text x="240" y="390" text-anchor="middle" font-size="14" font-weight="700" fill="#24292f">Adobe Lightroom Classic</text>
-  <text x="240" y="410" text-anchor="middle" font-size="11" fill="#57606a">LrC plugin: LightroomMCP (Start Server)</text>
-  <text x="240" y="428" text-anchor="middle" font-size="10" fill="#57606a">LrSocket :58763 request · :58764 response</text>
+  <rect x="472" y="156" width="190" height="128" rx="8" fill="#f6f8fa" stroke="#d0d7de"/>
+  <text x="567" y="180" text-anchor="middle" font-size="12" font-weight="600" fill="#24292f">Style + crop</text>
+  <text x="482" y="204" font-size="11" fill="#24292f">fingerprint vs reference</text>
+  <text x="482" y="222" font-size="11" fill="#24292f">visual → SDK crop</text>
+  <text x="482" y="240" font-size="11" fill="#24292f">standard ratios only</text>
+  <text x="567" y="268" text-anchor="middle" font-size="10" fill="#57606a">2:3 · 3:4 · 16:9 · 1:1</text>
 
-  <!-- Local Analysis Engine -->
-  <rect x="440" y="356" width="360" height="84" rx="10" fill="#ffffff" stroke="#0969da" stroke-width="2"/>
-  <text x="620" y="390" text-anchor="middle" font-size="14" font-weight="700" fill="#24292f">Local Analysis Engine</text>
-  <text x="620" y="410" text-anchor="middle" font-size="11" fill="#57606a">runs offline on exported renders</text>
-  <text x="620" y="428" text-anchor="middle" font-size="10" fill="#57606a">no Lightroom connection required</text>
+  <rect x="678" y="156" width="180" height="128" rx="8" fill="#f6f8fa" stroke="#d0d7de"/>
+  <text x="768" y="180" text-anchor="middle" font-size="12" font-weight="600" fill="#24292f">Knowledge</text>
+  <text x="688" y="204" font-size="11" fill="#24292f">tone · curves</text>
+  <text x="688" y="222" font-size="11" fill="#24292f">crop orientation</text>
+  <text x="688" y="240" font-size="11" fill="#24292f">style-match rules</text>
+  <text x="768" y="268" text-anchor="middle" font-size="10" fill="#57606a">docs/knowledge/</text>
 
-  <!-- Arrows -->
-  <line x1="240" y1="256" x2="240" y2="352" stroke="#57606a" stroke-width="1.5" marker-end="url(#arr)"/>
-  <text x="248" y="300" font-size="10.5" fill="#57606a">MCP over LrSocket</text>
+  <rect x="40" y="348" width="400" height="88" rx="10" fill="#ffffff" stroke="#d0d7de" stroke-width="1.5"/>
+  <text x="240" y="380" text-anchor="middle" font-size="13" font-weight="700" fill="#24292f">scripts/lr-plugin-call.mjs</text>
+  <text x="240" y="400" text-anchor="middle" font-size="11" fill="#57606a">NDJSON + token · no python MCP SDK</text>
+  <text x="240" y="418" text-anchor="middle" font-size="10" fill="#57606a">automaat Dispatcher / PluginSocket</text>
 
-  <line x1="420" y1="398" x2="436" y2="398" stroke="#57606a" stroke-width="1.5" marker-end="url(#arr)"/>
-  <text x="428" y="386" text-anchor="middle" font-size="10.5" fill="#57606a">exported render</text>
+  <rect x="480" y="348" width="400" height="88" rx="10" fill="#ffffff" stroke="#d0d7de" stroke-width="1.5"/>
+  <text x="680" y="380" text-anchor="middle" font-size="13" font-weight="700" fill="#24292f">Adobe Lightroom Classic</text>
+  <text x="680" y="400" text-anchor="middle" font-size="11" fill="#57606a">plugin LightroomMCP · Start Server</text>
+  <text x="680" y="418" text-anchor="middle" font-size="10" fill="#57606a">LrSocket :58763 request · :58764 response · 1:1</text>
 
-  <line x1="620" y1="256" x2="620" y2="352" stroke="#0969da" stroke-width="1.5" marker-end="url(#arr)"/>
-  <text x="628" y="300" font-size="10.5" fill="#57606a">analyze_photo(path)</text>
+  <line x1="460" y1="76" x2="460" y2="104" stroke="#57606a" stroke-width="1.5" marker-end="url(#arr)"/>
+  <line x1="240" y1="304" x2="240" y2="344" stroke="#57606a" stroke-width="1.5" marker-end="url(#arr)"/>
+  <line x1="440" y1="392" x2="476" y2="392" stroke="#57606a" stroke-width="1.5" marker-end="url(#arr)"/>
+  <text x="458" y="382" text-anchor="middle" font-size="10" fill="#57606a">set / export</text>
 
-  <!-- client -> layers -->
-  <line x1="240" y1="76" x2="240" y2="124" stroke="#57606a" stroke-width="1.5" marker-end="url(#arr)"/>
-  <line x1="620" y1="76" x2="620" y2="124" stroke="#57606a" stroke-width="1.5" marker-end="url(#arr)"/>
-
-  <!-- footer note -->
-  <text x="60" y="462" font-size="10" fill="#8c959f">Analysis and transport are independent MCP servers — the analysis layer works offline once a render exists.</text>
+  <text x="40" y="468" font-size="11" fill="#57606a">Look → edit → show. Style match uses a user-supplied reference JPEG, not a downloaded master-photo corpus.</text>
+  <text x="40" y="486" font-size="11" fill="#8c959f">Python gateway_daemon is deprecated. WorkBuddy’s automaat connector occupies the plugin sockets — disconnect it first.</text>
+  <text x="40" y="538" font-size="10" fill="#8c959f">Was (repo at start of this work): analysis-only MCP + a dead python gateway. Transport lived in a third-party MCP the agent could not reliably call.</text>
 </svg>

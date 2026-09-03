@@ -1,4 +1,18 @@
-# Gateway（多客户端仲裁层）— WIP 状态
+# Gateway（多客户端仲裁层）— 已废弃（python 路径）
+
+**2026-09-03：不要再启动 `gateway_daemon.py`。** python MCP SDK × automaat 会掐 stdin，已实证。
+
+现行修图路径：
+
+1. `scripts/lr-plugin-call.mjs` 直连插件 socket（`LRMCP_AUTOMAAT_DIST` 指向 automaat `server/dist`）
+2. Python `prepare_retouch` / `apply_retouch` / `restore_retouch`（`lightroom_agent.retouch.loop`）
+3. Agent skill：`skills/lightroom-retouch/SKILL.md`（先看 before.jpg → 再写 → 把 after.jpg 给用户看）
+
+常驻 node 多客户端 daemon 仍是下一刀，不是现在。
+
+---
+
+# 归档：原 WIP 状态
 
 ## 目标
 解决 automaat 单客户端锁 + WorkBuddy 守护抢占导致"脚本要用必须先停 WorkBuddy"的问题：
@@ -26,6 +40,25 @@ WorkBuddy（内建非 python MCP client）直连同一 automaat 工作正常 —
 - 用 node 写 gateway（node MCP SDK 与 automaat 同为 node 生态，大概率无此兼容问题）
 - 或 gateway 直连插件 socket（TCP NDJSON + token + 心跳），绕开 automaat MCP 层
 - 或等 python MCP SDK 修复 stdio client 兼容性后重试
+
+## 已打通（2026-09-03，Grok 接手后）
+
+**直连插件 socket，绕开 automaat MCP / python SDK / WorkBuddy oneOf。**
+
+脚本：`scripts/lr-plugin-call.mjs`
+
+协议（automaat Dispatcher 原样）：
+request `:58763` 发一行 `{"hello":"<token>","id":"req_…","action":"set_develop_settings","params":{…}}`
+response `:58764` 收回 `{"id":"…","result":{…}}`。token 读 `~/.config/lightroom-mcp/token`。
+
+已实测 JUN_3939（id 346763）：
+`set_develop_settings` → Exposure2012=0.15, Blacks2012=5, Temperature=5850, SaturationAdjustmentBlue=-15
+→ export 1080px JPEG → analyze_photo 对比基线全部朝预期方向。
+
+约束（与障碍 B 同类，但是 socket 层不是 lock 文件层）：
+LrSocket 1:1。WorkBuddy 的 lightroom MCP 连着时本脚本连不上。
+WorkBuddy 未占用时**不需要** automaat 实例锁——本脚本根本不启动 automaat。
+用完即断，插件会自己 rebind request/response。
 
 ## 当前稳定链路（无 gateway）
 WorkBuddy（内建 client）→ automaat server（单持有者）→ Lightroom 插件。

@@ -1,24 +1,27 @@
-"""main.py — Lightroom Agent 分析服务（自研，无插件依赖）
+"""main.py — 分析 + 先看再修再给你看（prepare / apply / restore）
 
-职责：对渲染图/照片做直方图、分区测光、色偏与曝光诊断，输出结构化建议。
-配合传输层（Lightroom MCP）使用：传输层负责从 Lightroom 导出照片，
-本服务负责"看懂"照片 —— 这是纯文本模型的视觉支点。
-
-工具：
-  analyze_photo(path)         分析单张照片（RGB/亮度直方图、11 区、5×5 测光、色偏、诊断）
-  batch_analyze(directory)    分析目录下所有图片，返回汇总
+分析层不依赖 Lightroom。prepare/apply 经 node CLI 直连 LrC 插件，
+不走 python MCP SDK，也不 spawn automaat。
 """
 from __future__ import annotations
 
-import json
 import logging
 import sys
 from pathlib import Path
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, List
 
 from fastmcp import FastMCP
 
 from lightroom_agent.analysis.histogram import analyze
+from lightroom_agent.retouch.loop import (
+    apply_auto_tone,
+    apply_retouch,
+    prepare_retouch,
+    restore_retouch,
+)
+from lightroom_agent.retouch.style import propose_style_match
+from lightroom_agent.retouch.prescription import PrescriptionError
+from lightroom_agent.retouch.transport import PluginError, plugin_call
 
 logging.basicConfig(level=logging.INFO, format="%(name)s %(levelname)s %(message)s",
                     stream=sys.stderr)
@@ -35,6 +38,16 @@ def _ok(data: Dict[str, Any]) -> Dict[str, Any]:
 
 def _err(msg: str) -> Dict[str, Any]:
     return {"ok": False, "error": {"message": msg}}
+
+
+def _caught(fn, *args, **kwargs) -> Dict[str, Any]:
+    try:
+        return _ok(fn(*args, **kwargs))
+    except (PrescriptionError, PluginError, FileNotFoundError, ValueError) as e:
+        return _err(str(e))
+    except Exception as e:
+        log.exception("retouch failed")
+        return _err(str(e))
 
 
 @mcp.tool
@@ -79,6 +92,49 @@ def batch_analyze(directory: str, limit: int = 50) -> Dict[str, Any]:
         except Exception as e:
             rows.append({"file": f.name, "error": str(e)})
     return _ok({"count": len(rows), "rows": rows})
+
+
+@mcp.tool
+def get_selected_photos(limit: int = 20) -> Dict[str, Any]:
+    """读取 Lightroom 当前选中的照片（id / filename）。修图前用这个拿到 photo_id。"""
+    return _caught(plugin_call, "get_selected_photos", {"limit": limit})
+
+
+@mcp.tool
+def prepare_retouch_photo(photo_id: str) -> Dict[str, Any]:
+    """修图第一拍：导出当前图、分析、快照 develop。不改目录。
+    调用方必须先阅读返回的 jpeg_path（能看图）或 analysis（不能看图），才允许 apply。"""
+    return _caught(prepare_retouch, photo_id)
+
+
+@mcp.tool
+def apply_retouch_photo(photo_id: str, settings: Dict[str, Any],
+                        snapshot_id: str) -> Dict[str, Any]:
+    """修图第二拍：写入白名单 develop（含裁切 0–1）并导出 after.jpg。
+    必须带 prepare 返回的 snapshot_id。调用后必须把 after_path 展示给用户。"""
+    return _caught(apply_retouch, photo_id, settings, snapshot_id)
+
+
+@mcp.tool
+def restore_retouch_photo(photo_id: str, snapshot_id: str) -> Dict[str, Any]:
+    """把照片 develop 写回 prepare 时的快照（用户说「撤」时用）。"""
+    return _caught(restore_retouch, photo_id, snapshot_id)
+
+
+@mcp.tool
+def apply_auto_tone_photo(photo_id: str, snapshot_id: str = "",
+                          white_balance: bool = False) -> Dict[str, Any]:
+    """点 Lightroom Develop 的 Auto（Sensei：8 个影调滑块）。不改白平衡除非 white_balance=true。
+    照片会被选中并切到 Develop。snapshot_id 来自 prepare，用于撤。"""
+    sid = snapshot_id or None
+    return _caught(apply_auto_tone, photo_id, sid, white_balance)
+
+
+@mcp.tool
+def propose_style_match_photo(photo_id: str, reference_path: str) -> Dict[str, Any]:
+    """对照一张例图 JPEG，算出当前照片该往哪边走的 develop 处方。不改目录。
+    调用方必须先看返回的 jpeg_path 和例图，再 apply_retouch_photo。"""
+    return _caught(propose_style_match, photo_id, reference_path)
 
 
 def main() -> None:
