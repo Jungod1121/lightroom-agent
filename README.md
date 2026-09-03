@@ -29,7 +29,7 @@ Lightroom 生态的 MCP 方案（如 [automaat/lightroom-mcp](https://github.com
 
 ```
 ┌────────────────────────────────────────────────────────────────┐
-│ AI Client (WorkBuddy / 任意 MCP 客户端)                          │
+│ AI Client (any MCP client)                                      │
 ├──────────────────────┬─────────────────────────────────────────┤
 │ mcp__lightroom__*    │   mcp__lightroom-analysis__*            │
 │ (传输层 · 第三方)     │   (分析层 · 本仓库)                       │
@@ -88,7 +88,7 @@ python3 -m venv .venv
 
 ### 配置到 MCP 客户端（完整双 server 示例）
 
-`~/.workbuddy/mcp.json`（WorkBuddy）或任意 MCP 客户端：
+任意 MCP 客户端的 server 配置（Claude Desktop 的 claude_desktop_config.json、Claude Code / Cursor / VS Code 的 mcp 配置、WorkBuddy 的 ~/.workbuddy/mcp.json 等）：
 
 ```json
 {

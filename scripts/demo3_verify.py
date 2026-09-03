@@ -40,8 +40,8 @@ async def main():
         try:
             pid = int(open(lock).read().strip() or 0)
             os.kill(pid, 0)
-            print("!! 传输层被其它 MCP 客户端占用（pid %d）——请在 WorkBuddy 停用 lightroom 连接器后重跑，"
-                  "或直接在 WorkBuddy 会话里演示。" % pid)
+            print("!! 传输层被其它 MCP 客户端占用（pid %d）——请停用占用方的 lightroom 连接器后重跑，"
+                  "或直接在占用方客户端会话里演示。" % pid)
             sys.exit(2)
         except (ProcessLookupError, ValueError):
             pass

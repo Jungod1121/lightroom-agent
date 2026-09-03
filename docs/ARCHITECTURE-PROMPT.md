@@ -16,7 +16,7 @@ borders of the two main layers. 16:9 wide layout, minimal, documentation-style
 
 Layout top to bottom:
 
-1. TOP - one wide rounded rectangle labeled "AI Client — WorkBuddy / any MCP client"
+1. TOP - one wide rounded rectangle labeled "AI Client — any MCP client (Claude Desktop, Claude Code, Cursor, ...)"
    spanning the full width.
 
 2. MIDDLE - two side-by-side rounded rectangles:
@@ -51,7 +51,7 @@ exactly as given.
 文档风格（类似 GitHub 官方项目 README 里的图）。
 
 从上到下：
-1. 顶部：贯穿全宽的圆角矩形「AI Client — WorkBuddy / any MCP client」
+1. 顶部：贯穿全宽的圆角矩形「AI Client — any MCP client (Claude Desktop, Claude Code, Cursor, ...)」
 2. 中部并排两个圆角矩形：
    左「Transport Layer (3rd-party)」副标题 automaat/lightroom-mcp，
       三条要点：photo & catalog read/write、export JPEG render、presets/snapshots/undo
@@ -76,7 +76,7 @@ exactly as given.
 
 ```mermaid
 flowchart TB
-    C["AI Client<br/>WorkBuddy / any MCP client"]
+    C["AI Client<br/>any MCP client<br/>(Claude Desktop / Claude Code / Cursor / ...)"]
     C --> T["Transport Layer (3rd-party)<br/>automaat/lightroom-mcp<br/>photo & catalog · export · presets/undo"]
     C --> A["Analysis Layer (this repo)<br/>lightroom-agent<br/>analyze_photo · batch_analyze"]
     T --> L["Adobe Lightroom Classic<br/>LrC plugin: LightroomMCP"]

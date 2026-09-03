@@ -39,10 +39,10 @@ def ensure_transport_free():
         try:
             pid = int(open(lock).read().strip() or 0)
             os.kill(pid, 0)  # 进程仍活着
-            print("!! 传输层正被其它 MCP 客户端占用（pid %d，通常是 WorkBuddy 的 automaat server）。" % pid)
+            print("!! 传输层正被其它 MCP 客户端占用（pid %d，如 Claude Desktop / WorkBuddy 等客户端拉起的 automaat server）。" % pid)
             print("   两种处理方式：")
-            print("   a) 临时停用 WorkBuddy 的 lightroom 连接器（或退出 WorkBuddy），跑完再启用")
-            print("   b) 在 WorkBuddy 会话里直接演示（推荐——分析层工具一样可用）")
+            print("   a) 临时停用其它客户端的 lightroom 连接器（或退出该客户端），跑完再启用")
+            print("   b) 在持有传输层的那个客户端会话里直接演示（分析层工具一样可用）")
             sys.exit(2)
         except (ProcessLookupError, ValueError):
             pass  # 陈旧锁，automaat server 会自行接管
