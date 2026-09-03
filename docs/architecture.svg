@@ -58,7 +58,6 @@
   <line x1="440" y1="392" x2="476" y2="392" stroke="#57606a" stroke-width="1.5" marker-end="url(#arr)"/>
   <text x="458" y="382" text-anchor="middle" font-size="10" fill="#57606a">set / export</text>
 
-  <text x="40" y="468" font-size="11" fill="#57606a">Look → edit → show. Style match uses a user-supplied reference JPEG, not a downloaded master-photo corpus.</text>
-  <text x="40" y="486" font-size="11" fill="#8c959f">Python gateway_daemon is deprecated. WorkBuddy’s automaat connector occupies the plugin sockets — disconnect it first.</text>
-  <text x="40" y="538" font-size="10" fill="#8c959f">Was (repo at start of this work): analysis-only MCP + a dead python gateway. Transport lived in a third-party MCP the agent could not reliably call.</text>
+  <text x="40" y="468" font-size="11" fill="#57606a">Look → edit → show. Style match uses a user-supplied reference JPEG.</text>
+  <text x="40" y="486" font-size="11" fill="#8c959f">LrSocket is 1:1 — only one client may hold the plugin at a time.</text>
 </svg>
