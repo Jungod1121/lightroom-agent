@@ -189,7 +189,7 @@ print(r.to_dict())
 
 ## Demo 演示
 
-三支演示脚本与讲解要点见 [docs/DEMO.md](docs/DEMO.md)，覆盖：
+三支可复跑脚本见 [scripts/](scripts/)（demo1 单张诊断 / demo2 批量扫描 / demo3 调参验证），讲解要点与录制注意事项见 [docs/DEMO.md](docs/DEMO.md)；架构图生图提示词见 [docs/ARCHITECTURE-PROMPT.md](docs/ARCHITECTURE-PROMPT.md)，覆盖：
 单张诊断闭环 / 批量一致性扫描 / 调参效果验证（含录制前注意事项）。
 
 ## 开发
