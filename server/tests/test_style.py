@@ -37,6 +37,22 @@ class SettingsFromGapTest(unittest.TestCase):
         out = settings_from_gap(src, ref, {"Temperature": 5350})
         self.assertLess(out["Temperature"], 5350)
 
+    def test_bands_sky_brighter_than_water(self):
+        import tempfile
+        from pathlib import Path
+        import numpy as np
+        from PIL import Image
+        from lightroom_agent.retouch.style import fingerprint_bands
+
+        arr = np.zeros((90, 60, 3), dtype=np.uint8)
+        arr[:30] = 200
+        arr[60:] = 40
+        arr[30:60] = 100
+        path = Path(tempfile.mkdtemp()) / "bands.jpg"
+        Image.fromarray(arr).save(path)
+        bands = fingerprint_bands(str(path))
+        self.assertGreater(bands["sky"].lum_mean, bands["water"].lum_mean)
+
 
 if __name__ == "__main__":
     unittest.main()

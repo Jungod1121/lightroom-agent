@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
-"""Demo 1 — 单张诊断闭环
+"""DEPRECATED — uses python MCP SDK × automaat (stdin killed).
+Use: node scripts/lr-plugin-call.mjs + prepare_retouch_photo.
+
+Demo 1 — 单张诊断闭环
 
 流程：读取 Lightroom 选中照片 → 导出 1080px JPEG → 自研分析 → 输出诊断与建议。
 

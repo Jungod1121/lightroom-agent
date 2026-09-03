@@ -35,6 +35,8 @@ def plugin_call(
     proc = run(cmd, env)
     if proc.returncode != 0:
         err = (proc.stderr or proc.stdout or "").strip() or f"exit {proc.returncode}"
+        if "Unknown action" in err:
+            err += " Reload Lightroom MCP in Plug-in Manager."
         raise PluginError(err[:800])
     text = (proc.stdout or "").strip()
     if not text:

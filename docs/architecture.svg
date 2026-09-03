@@ -44,9 +44,9 @@
   <text x="768" y="268" text-anchor="middle" font-size="10" fill="#57606a">docs/knowledge/</text>
 
   <rect x="40" y="348" width="400" height="88" rx="10" fill="#ffffff" stroke="#d0d7de" stroke-width="1.5"/>
-  <text x="240" y="380" text-anchor="middle" font-size="13" font-weight="700" fill="#24292f">scripts/lr-plugin-call.mjs</text>
-  <text x="240" y="400" text-anchor="middle" font-size="11" fill="#57606a">NDJSON + token · no python MCP SDK</text>
-  <text x="240" y="418" text-anchor="middle" font-size="10" fill="#57606a">automaat Dispatcher / PluginSocket</text>
+  <text x="240" y="380" text-anchor="middle" font-size="13" font-weight="700" fill="#24292f">lr-gateway.mjs :58770</text>
+  <text x="240" y="400" text-anchor="middle" font-size="11" fill="#57606a">owns plugin sockets · multiplexes CLI/MCP</text>
+  <text x="240" y="418" text-anchor="middle" font-size="10" fill="#57606a">JSON-lines · start-gateway.sh</text>
 
   <rect x="480" y="348" width="400" height="88" rx="10" fill="#ffffff" stroke="#d0d7de" stroke-width="1.5"/>
   <text x="680" y="380" text-anchor="middle" font-size="13" font-weight="700" fill="#24292f">Adobe Lightroom Classic</text>

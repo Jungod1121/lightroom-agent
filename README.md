@@ -23,7 +23,7 @@ This repo is the **eyes and hands** for an agent sitting in Lightroom Classic: e
 ## Features
 
 - **See** — histogram, clip, Adams 11 zones, 5×5 metering, color cast, EV range on an 8-bit render
-- **Edit** — basic panel, HSL, point curves, Lightroom Auto (Sensei), standard-ratio crop
+- **Edit** — basic panel, HSL, point curves, Lightroom Auto (Sensei), AI masks (sky / subject / background), linear/radial gradients, standard-ratio crop
 - **Match** — fingerprint a reference JPEG and emit a develop prescription
 - **Loop** — prepare (no write) → apply → restore
 - **Talk to LrC** — `scripts/lr-plugin-call.mjs` over the Classic plugin sockets
@@ -34,9 +34,12 @@ Needs **macOS**, **Lightroom Classic** with the MCP plugin **Start Server**, **P
 
 ```bash
 git clone https://github.com/Jungod1121/lightroom-agent.git
-cd lightroom-agent/server
-python3 -m venv .venv
-./.venv/bin/pip install -r requirements.txt
+cd lightroom-agent
+chmod +x scripts/*.sh
+./scripts/install.sh
+./scripts/start-gateway.sh
+# Lightroom → Plug-in Manager → Lightroom MCP → Start Server, then Reload
+node scripts/lr-plugin-call.mjs ping
 ```
 
 MCP client:
@@ -108,7 +111,7 @@ This repo’s bet is **measurable renders + LrC develop writes + a user-supplied
 
 ## Limitations
 
-- Plugin sockets are **1:1**. Another MCP (e.g. WorkBuddy → automaat) holding them will block this CLI.
+- Plugin sockets are **1:1** at the Lua layer. Run `scripts/start-gateway.sh` so CLI and MCP share one owner; point WorkBuddy at this repo’s MCP, not automaat.
 - Style match moves global tone/color. It does not copy composition.
 - Histogram suggestions misfire on night / teal looks — evidence, not a prescription.
 - No masks, no lens calibration.

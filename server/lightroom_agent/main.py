@@ -20,6 +20,12 @@ from lightroom_agent.retouch.loop import (
     restore_retouch,
 )
 from lightroom_agent.retouch.style import propose_style_match
+from lightroom_agent.retouch.masks import (
+    create_ai_mask,
+    create_gradient_mask,
+    list_masks,
+    set_mask_settings,
+)
 from lightroom_agent.retouch.prescription import PrescriptionError
 from lightroom_agent.retouch.transport import PluginError, plugin_call
 
@@ -128,6 +134,34 @@ def apply_auto_tone_photo(photo_id: str, snapshot_id: str = "",
     照片会被选中并切到 Develop。snapshot_id 来自 prepare，用于撤。"""
     sid = snapshot_id or None
     return _caught(apply_auto_tone, photo_id, sid, white_balance)
+
+
+@mcp.tool
+def create_ai_mask_photo(photo_id: str, mask_type: str,
+                         operation: str = "new") -> Dict[str, Any]:
+    """在 Develop 里创建 AI 蒙版：sky / subject / background / landscape / people / objects。
+    之后用 set_mask_settings_photo 对该蒙版写局部滑块。插件需 Reload。"""
+    return _caught(create_ai_mask, photo_id, mask_type, operation)
+
+
+@mcp.tool
+def create_gradient_mask_photo(photo_id: str, kind: str = "linear") -> Dict[str, Any]:
+    """线性或径向渐变蒙版（Lightroom 默认几何，通常线性为自上而下）。"""
+    return _caught(create_gradient_mask, photo_id, kind)
+
+
+@mcp.tool
+def list_masks_photo(photo_id: str) -> Dict[str, Any]:
+    """列出当前照片的蒙版。"""
+    return _caught(list_masks, photo_id)
+
+
+@mcp.tool
+def set_mask_settings_photo(photo_id: str, settings: Dict[str, Any],
+                            mask_id: str = "") -> Dict[str, Any]:
+    """对当前（或 mask_id）蒙版写入白名单滑块。"""
+    mid = mask_id or None
+    return _caught(set_mask_settings, photo_id, settings, mid)
 
 
 @mcp.tool

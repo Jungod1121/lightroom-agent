@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
-"""Demo 3 — 调参效果验证（调前/调后对比）
+"""DEPRECATED — python MCP SDK × automaat. Use prepare_retouch / apply_retouch.
+
+Demo 3 — 调参效果验证（调前/调后对比）
 
 流程：分析基线 → 压高光/提阴影 → 再导出再分析 → 输出前后对比。
 （演示"看 → 判断 → 调 → 验证"闭环的最后一步：用数据证明调对了。）

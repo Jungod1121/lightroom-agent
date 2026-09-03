@@ -29,8 +29,15 @@ class StyleFingerprint:
     zone_lo: float
 
 
-def fingerprint(src: Union[str, HistogramResult]) -> StyleFingerprint:
-    hist = src if isinstance(src, HistogramResult) else analyze(src)
+def fingerprint(src: Union[str, HistogramResult, Any]) -> StyleFingerprint:
+    from PIL import Image as PILImage
+
+    if isinstance(src, HistogramResult):
+        hist = src
+    elif isinstance(src, PILImage.Image):
+        hist = analyze(src)
+    else:
+        hist = analyze(src)
     lum = hist.statistics["Lum"]
     cast = hist.cast or {}
     zones = hist.zones or [0.0] * 11
@@ -120,6 +127,36 @@ def settings_from_gap(
     }
 
 
+SKY_KEYS = (
+    "Highlights2012", "Whites2012", "Dehaze", "Temperature", "Tint",
+    "LuminanceAdjustmentBlue", "SaturationAdjustmentBlue", "SaturationAdjustmentAqua",
+)
+WATER_KEYS = (
+    "Exposure2012", "Shadows2012", "Blacks2012", "Contrast2012",
+    "HueAdjustmentAqua", "SaturationAdjustmentAqua", "SaturationAdjustmentGreen",
+    "LuminanceAdjustmentAqua",
+)
+
+
+def _pick(settings: Dict[str, Any], keys: tuple) -> Dict[str, Any]:
+    return {k: settings[k] for k in keys if k in settings}
+
+
+def fingerprint_bands(path: str) -> Dict[str, StyleFingerprint]:
+    """Global + top-third (sky) + bottom-third (water/ground) fingerprints."""
+    from PIL import Image
+
+    img = Image.open(path).convert("RGB")
+    w, h = img.size
+    sky = img.crop((0, 0, w, max(1, int(h * 0.33))))
+    water = img.crop((0, min(h - 1, int(h * 0.67)), w, h))
+    return {
+        "global": fingerprint(img),
+        "sky": fingerprint(sky),
+        "water": fingerprint(water),
+    }
+
+
 def propose_style_match(
     photo_id: str,
     reference_path: str,
@@ -139,15 +176,25 @@ def propose_style_match(
     root = Path(export_root) if export_root else DEFAULT_EXPORT_ROOT
     meta = call("get_photo_metadata", {"photo_id": str(photo_id)})
     jpeg = _export(call, str(photo_id), root / str(photo_id) / "style-src")
-    src = fingerprint(str(jpeg))
-    ref = fingerprint(reference_path)
-    settings = settings_from_gap(src, ref, develop_from_metadata(meta))
+    src_bands = fingerprint_bands(str(jpeg))
+    ref_bands = fingerprint_bands(reference_path)
+    current = develop_from_metadata(meta)
+    global_settings = settings_from_gap(src_bands["global"], ref_bands["global"], current)
+    sky_settings = _pick(
+        settings_from_gap(src_bands["sky"], ref_bands["sky"], current), SKY_KEYS)
+    water_settings = _pick(
+        settings_from_gap(src_bands["water"], ref_bands["water"], current), WATER_KEYS)
     return {
         "photo_id": str(photo_id),
         "jpeg_path": str(jpeg),
         "reference_path": reference_path,
-        "source": src.__dict__,
-        "reference": ref.__dict__,
-        "settings": settings,
-        "instruction": "Look at jpeg_path and the reference, then apply_retouch with settings.",
+        "source": {k: v.__dict__ for k, v in src_bands.items()},
+        "reference": {k: v.__dict__ for k, v in ref_bands.items()},
+        "settings": global_settings,
+        "sky": sky_settings,
+        "water": water_settings,
+        "instruction": (
+            "Look at jpeg_path and the reference. Apply settings globally, "
+            "then create_ai_mask sky/subject and set_mask_settings with sky/water."
+        ),
     }
