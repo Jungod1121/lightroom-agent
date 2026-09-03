@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 560" font-family="-apple-system, BlinkMacSystemFont, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Noto Sans CJK SC', 'Segoe UI', Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#57606a"/>
+    </marker>
+    <filter id="cardShadow" x="-8%" y="-8%" width="116%" height="124%">
+      <feDropShadow dx="0" dy="1.5" stdDeviation="2.5" flood-color="#1f2328" flood-opacity="0.07"/>
+    </filter>
+  </defs>
+  <rect width="920" height="560" fill="#ffffff"/>
+
+  <!-- 顶部：Agent 会话 -->
+  <rect x="40" y="20" width="840" height="56" rx="10" fill="#f6f8fa" stroke="#d0d7de" stroke-width="1.5"/>
+  <text x="460" y="45" text-anchor="middle" font-size="16" font-weight="600" fill="#1f2328">Agent 会话（Grok / WorkBuddy / …）</text>
+  <text x="460" y="64" text-anchor="middle" font-size="11.5" fill="#57606a">先看 JPEG → 判断（或匹配参考图）→ 应用调整 → 展示结果</text>
+
+  <!-- 本仓库外框 -->
+  <rect x="40" y="108" width="840" height="196" rx="10" fill="#ffffff" stroke="#0969da" stroke-width="2"/>
+  <rect x="40" y="108" width="840" height="32" rx="10" fill="#ddf4ff"/>
+  <rect x="40" y="128" width="840" height="12" fill="#ddf4ff"/>
+  <text x="460" y="130" text-anchor="middle" font-size="13.5" font-weight="700" fill="#1f2328">本仓库 · lightroom-agent</text>
+
+  <!-- 卡片 1：分析 -->
+  <rect x="60" y="156" width="190" height="128" rx="8" fill="#f6f8fa" stroke="#d8dee4" filter="url(#cardShadow)"/>
+  <text x="155" y="179" text-anchor="middle" font-size="13.5" font-weight="700" fill="#0969da">分析</text>
+  <line x1="76" y1="189" x2="234" y2="189" stroke="#e1e7ec" stroke-width="1"/>
+  <text x="76" y="213" font-size="12" fill="#1f2328">直方图 · 11 分区</text>
+  <text x="76" y="233" font-size="12" fill="#1f2328">5×5 网格 · 色偏</text>
+  <text x="76" y="253" font-size="12" fill="#1f2328">EV 范围</text>
+  <text x="155" y="273" text-anchor="middle" font-size="11" fill="#6e7781">numpy · 可离线运行</text>
+
+  <!-- 卡片 2：精修闭环 -->
+  <rect x="266" y="156" width="190" height="128" rx="8" fill="#f6f8fa" stroke="#d8dee4" filter="url(#cardShadow)"/>
+  <text x="361" y="179" text-anchor="middle" font-size="13.5" font-weight="700" fill="#0969da">精修闭环</text>
+  <line x1="282" y1="189" x2="440" y2="189" stroke="#e1e7ec" stroke-width="1"/>
+  <text x="282" y="213" font-size="12" fill="#1f2328">准备 · 应用 · 还原</text>
+  <text x="282" y="233" font-size="12" fill="#1f2328">白名单 + 快照</text>
+  <text x="282" y="253" font-size="12" fill="#1f2328">点曲线</text>
+  <text x="361" y="273" text-anchor="middle" font-size="11" fill="#6e7781">写入 LrC 开发模块</text>
+
+  <!-- 卡片 3：风格 + 裁切 -->
+  <rect x="472" y="156" width="190" height="128" rx="8" fill="#f6f8fa" stroke="#d8dee4" filter="url(#cardShadow)"/>
+  <text x="567" y="179" text-anchor="middle" font-size="13.5" font-weight="700" fill="#0969da">风格 + 裁切</text>
+  <line x1="488" y1="189" x2="646" y2="189" stroke="#e1e7ec" stroke-width="1"/>
+  <text x="488" y="213" font-size="12" fill="#1f2328">参考图指纹比对</text>
+  <text x="488" y="233" font-size="12" fill="#1f2328">视觉 → SDK 裁切</text>
+  <text x="488" y="253" font-size="12" fill="#1f2328">仅标准比例</text>
+  <text x="567" y="273" text-anchor="middle" font-size="11" fill="#6e7781">2:3 · 3:4 · 16:9 · 1:1</text>
+
+  <!-- 卡片 4：知识库 -->
+  <rect x="678" y="156" width="180" height="128" rx="8" fill="#f6f8fa" stroke="#d8dee4" filter="url(#cardShadow)"/>
+  <text x="768" y="179" text-anchor="middle" font-size="13.5" font-weight="700" fill="#0969da">知识库</text>
+  <line x1="694" y1="189" x2="842" y2="189" stroke="#e1e7ec" stroke-width="1"/>
+  <text x="694" y="213" font-size="12" fill="#1f2328">色调 · 曲线</text>
+  <text x="694" y="233" font-size="12" fill="#1f2328">裁切方向</text>
+  <text x="694" y="253" font-size="12" fill="#1f2328">风格匹配规则</text>
+  <text x="768" y="273" text-anchor="middle" font-size="11" fill="#6e7781">docs/knowledge/</text>
+
+  <!-- 底部：网关 -->
+  <rect x="40" y="348" width="400" height="88" rx="10" fill="#ffffff" stroke="#d0d7de" stroke-width="1.5" filter="url(#cardShadow)"/>
+  <text x="240" y="381" text-anchor="middle" font-size="13.5" font-weight="700" fill="#1f2328">lr-gateway.mjs :58770</text>
+  <text x="240" y="402" text-anchor="middle" font-size="11.5" fill="#57606a">持有插件 socket · 复用 CLI / MCP</text>
+  <text x="240" y="421" text-anchor="middle" font-size="10.5" fill="#8c959f">JSON-lines · start-gateway.sh</text>
+
+  <!-- 底部：Lightroom Classic -->
+  <rect x="480" y="348" width="400" height="88" rx="10" fill="#ffffff" stroke="#d0d7de" stroke-width="1.5" filter="url(#cardShadow)"/>
+  <text x="680" y="381" text-anchor="middle" font-size="13.5" font-weight="700" fill="#1f2328">Adobe Lightroom Classic</text>
+  <text x="680" y="402" text-anchor="middle" font-size="11.5" fill="#57606a">插件 LightroomMCP · 启动服务</text>
+  <text x="680" y="421" text-anchor="middle" font-size="10.5" fill="#8c959f">LrSocket :58763 请求 · :58764 响应 · 1:1</text>
+
+  <!-- 连接线与箭头 -->
+  <line x1="460" y1="76" x2="460" y2="104" stroke="#57606a" stroke-width="1.5" marker-end="url(#arr)"/>
+  <line x1="240" y1="304" x2="240" y2="344" stroke="#57606a" stroke-width="1.5" marker-end="url(#arr)"/>
+  <line x1="440" y1="392" x2="476" y2="392" stroke="#57606a" stroke-width="1.5" marker-end="url(#arr)"/>
+  <text x="458" y="383" text-anchor="middle" font-size="10.5" fill="#6e7781">设置 / 导出</text>
+
+  <!-- 底部说明 -->
+  <text x="40" y="468" font-size="11.5" fill="#57606a">看 → 改 → 展示。风格匹配使用用户提供的参考 JPEG。</text>
+  <text x="40" y="488" font-size="11.5" fill="#8c959f">LrSocket 为 1:1 —— 同一时刻只能有一个客户端持有该插件。</text>
+</svg>

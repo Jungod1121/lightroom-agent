@@ -4,6 +4,8 @@
 
 **An agent that can see a Lightroom photo, edit it, and show you the result.**
 
+**English** · [简体中文](README.zh-CN.md)
+
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.11%2B-blue)](https://www.python.org)
 [![MCP](https://img.shields.io/badge/protocol-MCP-green)](https://modelcontextprotocol.io)
@@ -114,18 +116,18 @@ This repo’s bet is **measurable renders + LrC develop writes + a user-supplied
 - Plugin sockets are **1:1** at the Lua layer. Run `scripts/start-gateway.sh` so CLI and MCP share one owner; point WorkBuddy at this repo’s MCP, not automaat.
 - Style match moves global tone/color. It does not copy composition.
 - Histogram suggestions misfire on night / teal looks — evidence, not a prescription.
-- No masks, no lens calibration.
-- `apply_auto_tone_photo` is Classic’s Auto (8 sliders). Reload the Lua plugin after installing `set_auto_tone`.
+- No brush, healing, or spot removal. AI sky/subject/gradient masks and Auto need a plugin **Reload** after install.
+- `apply_auto_tone_photo` is Classic’s Auto (8 sliders).
 
 ## Documentation
 
-- [Architecture](docs/architecture.svg)
+- [Architecture](docs/architecture.svg) ([中文](docs/architecture.zh-CN.svg))
 - [Tone, curves, crop, style](docs/knowledge/README.md)
 - [Plugin socket notes](archive/README.md)
 
 ## Contributing
 
-Issues and PRs welcome. Run tests from `server/`:
+Issues and PRs welcome. Keep `README.md` / `README.zh-CN.md` and `docs/architecture.svg` / `docs/architecture.zh-CN.svg` in lockstep — if you change one, change the other. Run tests from `server/`:
 
 ```bash
 ./.venv/bin/python -m unittest discover -s tests
