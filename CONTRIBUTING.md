@@ -4,10 +4,12 @@
 
 These files are pairs. Update **both** in the same change:
 
-| English | 中文 |
+| English (GitHub homepage) | 中文 |
 |---|---|
 | `README.md` | `README.zh-CN.md` |
 | `docs/architecture.svg` | `docs/architecture.zh-CN.svg` |
+
+GitHub only renders `README.md` on the repo home. Keep English there; Chinese stays a linked page.
 
 Do not add a “what changed vs last week” section to either README. Describe the product as it is now.
 

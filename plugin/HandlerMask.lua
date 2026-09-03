@@ -1,7 +1,9 @@
+local LrApplication = import 'LrApplication'
+local LrApplicationView = import 'LrApplicationView'
 local LrDevelopController = import 'LrDevelopController'
 local LrTasks = import 'LrTasks'
 
-local DevelopReady = require 'DevelopReady'
+local PhotoLookup = require 'PhotoLookup'
 local Log = require 'Log'
 
 local MaskHandler = {}
@@ -21,17 +23,51 @@ local function requireString(v, name)
     end
 end
 
+local function ensureDevelop(photo_id)
+    local catalog = LrApplication.activeCatalog()
+    local photo = nil
+    catalog:withReadAccessDo(function()
+        photo = PhotoLookup.resolveOne(catalog, photo_id)
+    end)
+    if not photo then
+        error("Photo not found: " .. tostring(photo_id))
+    end
+    catalog:setSelectedPhotos(photo, {})
+    if LrApplicationView.getCurrentModuleName() ~= "develop" then
+        LrApplicationView.switchToModule("develop")
+    end
+    local waited = 0
+    while waited < 12 do
+        local ready = false
+        if LrApplicationView.getCurrentModuleName() == "develop" then
+            catalog:withReadAccessDo(function()
+                ready = catalog:getTargetPhoto() == photo
+            end)
+        end
+        if ready then
+            return photo
+        end
+        LrTasks.sleep(0.25)
+        waited = waited + 0.25
+    end
+    error("Develop module did not select photo " .. tostring(photo_id) .. " in time")
+end
+
 local function serializeMasks(masks)
     local out = {}
     if type(masks) ~= "table" then
         return out
     end
     for i, m in ipairs(masks) do
-        out[i] = {
-            id = m.id or m.ID or m.maskId,
-            name = m.name or m.Name,
-            type = m.type or m.maskType,
-        }
+        local item = {}
+        if type(m) == "table" then
+            item.id = m.id or m.ID or m.maskId
+            item.name = m.name or m.Name
+            item.type = m.type or m.maskType
+        else
+            item.id = tostring(m)
+        end
+        out[i] = item
     end
     return out
 end
@@ -43,7 +79,7 @@ function MaskHandler.createAiMask(args)
     if not AI_SUBTYPES[subtype] then
         error("mask_type must be subject, sky, background, objects, people, or landscape")
     end
-    DevelopReady.ensure(args.photo_id)
+    ensureDevelop(args.photo_id)
     local op = args.operation or "new"
     if op == "add" then
         LrDevelopController.addToCurrentMask("aiSelection", subtype)
@@ -54,46 +90,44 @@ function MaskHandler.createAiMask(args)
     else
         LrDevelopController.createNewMask("aiSelection", subtype)
     end
-    -- Sensei mask generation is slow
     LrTasks.sleep(1.2)
-    local selected = LrDevelopController.getSelectedMask()
-    local all = LrDevelopController.getAllMasks()
     Log.info(string.format("createAiMask photo=%s type=%s", args.photo_id, subtype))
     return {
         success = true,
         photo_id = args.photo_id,
         mask_type = subtype,
-        selected = selected,
-        masks = serializeMasks(all),
+        selected = LrDevelopController.getSelectedMask(),
+        masks = serializeMasks(LrDevelopController.getAllMasks()),
     }
 end
 
 function MaskHandler.createGradientMask(args)
     requireString(args.photo_id, "photo_id")
     local kind = args.kind or "linear"
-    DevelopReady.ensure(args.photo_id)
+    ensureDevelop(args.photo_id)
     if kind == "radial" then
         LrDevelopController.createNewMask("radialGradient")
     else
         LrDevelopController.createNewMask("gradient")
     end
     LrTasks.sleep(0.4)
-    local selected = LrDevelopController.getSelectedMask()
     Log.info(string.format("createGradientMask photo=%s kind=%s", args.photo_id, kind))
     return {
         success = true,
         photo_id = args.photo_id,
         kind = kind,
-        selected = selected,
-        note = "Gradient uses Lightroom's default geometry (typically top-down for linear). Brush painting is not supported.",
+        selected = LrDevelopController.getSelectedMask(),
     }
 end
 
 function MaskHandler.listMasks(args)
     requireString(args.photo_id, "photo_id")
-    DevelopReady.ensure(args.photo_id)
-    local all = LrDevelopController.getAllMasks()
-    return { success = true, photo_id = args.photo_id, masks = serializeMasks(all) }
+    ensureDevelop(args.photo_id)
+    return {
+        success = true,
+        photo_id = args.photo_id,
+        masks = serializeMasks(LrDevelopController.getAllMasks()),
+    }
 end
 
 function MaskHandler.selectMask(args)
@@ -101,7 +135,7 @@ function MaskHandler.selectMask(args)
     if args.mask_id == nil then
         error("mask_id is required")
     end
-    DevelopReady.ensure(args.photo_id)
+    ensureDevelop(args.photo_id)
     LrDevelopController.selectMask(args.mask_id)
     return { success = true, photo_id = args.photo_id, mask_id = args.mask_id }
 end
@@ -111,21 +145,19 @@ function MaskHandler.setMaskSettings(args)
     if type(args.settings) ~= "table" then
         error("settings must be a table")
     end
-    DevelopReady.ensure(args.photo_id)
+    ensureDevelop(args.photo_id)
     if args.mask_id ~= nil then
         LrDevelopController.selectMask(args.mask_id)
         LrTasks.sleep(0.15)
     end
     local applied = {}
+    local n = 0
     for key, value in pairs(args.settings) do
         LrDevelopController.setValue(key, value)
         applied[key] = value
+        n = n + 1
     end
-    Log.info(string.format("setMaskSettings photo=%s keys=%d", args.photo_id, (function()
-        local n = 0
-        for _ in pairs(applied) do n = n + 1 end
-        return n
-    end)()))
+    Log.info(string.format("setMaskSettings photo=%s keys=%d", args.photo_id, n))
     return { success = true, photo_id = args.photo_id, applied = applied }
 end
 
@@ -134,7 +166,7 @@ function MaskHandler.deleteMask(args)
     if args.mask_id == nil then
         error("mask_id is required")
     end
-    DevelopReady.ensure(args.photo_id)
+    ensureDevelop(args.photo_id)
     LrDevelopController.deleteMask(args.mask_id)
     return { success = true, photo_id = args.photo_id, mask_id = args.mask_id }
 end
