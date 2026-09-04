@@ -25,7 +25,8 @@ This repo is the **eyes and hands** for an agent sitting in Lightroom Classic: e
 ## Features
 
 - **See** — histogram, clip, Adams 11 zones, 5×5 metering, color cast, EV range on an 8-bit render
-- **Edit** — basic panel, HSL, point curves, Lightroom Auto (Sensei), AI masks (sky / subject / background), linear/radial gradients, standard-ratio crop
+- **Edit** — basic panel, HSL, point curves, Lightroom Auto (Sensei), standard-ratio crop
+- **Mask** — AI types sky / subject / background / objects / people / landscape; add / subtract / intersect; linear / radial gradients; per-group local sliders
 - **Match** — fingerprint a reference JPEG and emit a develop prescription
 - **Loop** — prepare (no write) → apply → restore
 - **Talk to LrC** — `scripts/lr-plugin-call.mjs` over the Classic plugin sockets
@@ -97,6 +98,24 @@ propose_style_match_photo(photo_id, "/path/to/reference.jpg")
 apply_auto_tone_photo(photo_id, snapshot_id)   # Develop Auto button
 ```
 
+Masks (Develop; **Reload** the plugin once after install):
+
+```
+create_ai_mask_photo(photo_id, "sky")
+create_ai_mask_photo(photo_id, "objects")      # user clicks the object in the photo
+create_ai_mask_photo(photo_id, "landscape")    # then ask the user to check Water / 水面
+create_ai_mask_photo(photo_id, "sky", "subtract")
+# last group; most sliders 0–1 (0.28 = UI +28); exposure is EV
+set_mask_settings_photo(photo_id, {"Shadows2012": 0.40, "Exposure2012": 0.12})
+```
+
+Target a specific group from the CLI (`group_index` is 1-based):
+
+```bash
+node scripts/lr-plugin-call.mjs set_mask_settings \
+  '{"photo_id":"7007","group_index":4,"settings":{"Shadows2012":0.4,"Exposure2012":0.12}}'
+```
+
 Crop uses on-screen top/left/bottom/right, mapped through Lr orientation. Ratios: `1:1` `2:3` `3:2` `3:4` `4:3` `4:5` `16:9` `9:16`.
 
 ```bash
@@ -116,8 +135,12 @@ This repo’s bet is **measurable renders + LrC develop writes + a user-supplied
 - Plugin sockets are **1:1** at the Lua layer. Run `scripts/start-gateway.sh` so CLI and MCP share one owner; point WorkBuddy at this repo’s MCP, not automaat.
 - Style match moves global tone/color. It does not copy composition.
 - Histogram suggestions misfire on night / teal looks — evidence, not a prescription.
-- No brush, healing, or spot removal. AI sky/subject/gradient masks and Auto need a plugin **Reload** after install.
-- `apply_auto_tone_photo` is Classic’s Auto (8 sliders).
+- No brush, healing, or spot removal.
+- **Objects:** `objects` opens Select Objects. The SDK cannot pick “the bed” by name — the user clicks. A new group exists only after that click.
+- **Landscape water:** there is no reliable `water` subtype. Ask the user to check Water / 水面, then create. Do not click the Lightroom UI.
+- Mask sliders write the **last** group unless `group_index` is passed on the plugin call. MCP `set_mask_settings_photo` does not take `group_index` yet.
+- Local sliders are 0–1 (`0.28` = UI +28). Local exposure is EV. `list_masks_photo` currently returns little from the live plugin.
+- AI masks, gradients, and Auto need a plugin **Reload** after install. `apply_auto_tone_photo` is Classic’s Auto (8 sliders).
 
 ## Documentation
 

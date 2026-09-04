@@ -35,7 +35,7 @@
   <line x1="282" y1="189" x2="440" y2="189" stroke="#e1e7ec" stroke-width="1"/>
   <text x="282" y="213" font-size="12" fill="#1f2328">准备 · 应用 · 还原</text>
   <text x="282" y="233" font-size="12" fill="#1f2328">白名单 + 快照</text>
-  <text x="282" y="253" font-size="12" fill="#1f2328">点曲线</text>
+  <text x="282" y="253" font-size="12" fill="#1f2328">Auto · 蒙版 · 曲线</text>
   <text x="361" y="273" text-anchor="middle" font-size="11" fill="#6e7781">写入 LrC 开发模块</text>
 
   <!-- 卡片 3：风格 + 裁切 -->

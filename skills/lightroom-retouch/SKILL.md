@@ -1,7 +1,7 @@
 ---
 name: lightroom-retouch
 description: >
-  把 Lightroom Classic 里一张原图修好并给用户看。先看再写：全局、AI 蒙版（天空/主体）、渐变、例图分区、Lr Auto。
+  把 Lightroom Classic 里一张原图修好并给用户看。先看再写：全局、AI 蒙版（天空/主体/对象/景观）、渐变、例图分区、Lr Auto。
   触发：修图、修这张、修一下、retouch、Lightroom 调色、例图风格。
 ---
 
@@ -15,8 +15,10 @@ description: >
 
 1. `prepare_retouch_photo(photo_id)` — 不改目录。
 2. **先看** `jpeg_path`（或 analysis）。
-3. 全局 `apply_retouch_photo`；天空/水要分开则 `create_ai_mask_photo`（sky/subject/background）+ `set_mask_settings_photo`。
+3. 全局 `apply_retouch_photo`；分区则 `create_ai_mask_photo`（sky / subject / background / objects / people / landscape）+ `set_mask_settings_photo`。
 4. 贴 `after_path`。撤：`restore_retouch_photo`。
+
+蒙版：局部滑块 0–1（曝光是 EV），默认写最后一组；指定组用 CLI `group_index`。`objects` 要用户点图；景观「水面」要用户勾选，不要替点 UI。
 
 例图：`propose_style_match_photo` 返回 `settings`（全局）以及 `sky` / `water`（给蒙版）。先看两张图再写。
 

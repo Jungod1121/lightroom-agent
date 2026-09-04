@@ -27,7 +27,8 @@ Lightroom 的 MCP 桥可以拖滑块，但说不出天空有没有飞、竖拍 R
 ## 功能特性
 
 - **看** — 8 位渲染图上的直方图、clip、Adams 11 区、5×5 测光、色偏、EV
-- **改** — 基本面板、HSL、点曲线、Lightroom Auto（Sensei）、AI 蒙版（天空 / 主体 / 背景）、线性 / 径向渐变、标准比例裁切
+- **改** — 基本面板、HSL、点曲线、Lightroom Auto（Sensei）、标准比例裁切
+- **蒙版** — AI 类型 sky / subject / background / objects / people / landscape；加 / 减 / 相交；线性 / 径向渐变；按组写局部滑块
 - **对例图** — 给参考 JPEG 做指纹，输出 develop 处方（全局 + 天空带 + 水面带）
 - **闭环** — 准备（不写目录）→ 应用 → 还原
 - **连 LrC** — `scripts/lr-plugin-call.mjs`；多客户端走 `scripts/start-gateway.sh`
@@ -97,7 +98,24 @@ get_selected_photos
 ```
 propose_style_match_photo(photo_id, "/path/to/reference.jpg")
 apply_auto_tone_photo(photo_id, snapshot_id)   # Develop 里的 Auto
-create_ai_mask_photo(photo_id, "sky")         # 需插件已 Reload
+```
+
+蒙版（Develop；装完插件 **Reload** 一次）：
+
+```
+create_ai_mask_photo(photo_id, "sky")
+create_ai_mask_photo(photo_id, "objects")      # 用户在图上点对象
+create_ai_mask_photo(photo_id, "landscape")    # 再请用户勾选「水面」
+create_ai_mask_photo(photo_id, "sky", "subtract")
+# 默认写最后一组；多数滑块 0–1（0.28 = 界面 +28）；曝光是 EV
+set_mask_settings_photo(photo_id, {"Shadows2012": 0.40, "Exposure2012": 0.12})
+```
+
+指定某一组用 CLI（`group_index` 从 1 起）：
+
+```bash
+node scripts/lr-plugin-call.mjs set_mask_settings \
+  '{"photo_id":"7007","group_index":4,"settings":{"Shadows2012":0.4,"Exposure2012":0.12}}'
 ```
 
 裁切用屏幕上的上/左/下/右，经朝向映射到 SDK。比例：`1:1` `2:3` `3:2` `3:4` `4:3` `4:5` `16:9` `9:16`。
@@ -119,8 +137,12 @@ cd server && ./.venv/bin/python -m unittest discover -s tests
 - Lua 层插件 socket 仍是 **1:1**。用 `scripts/start-gateway.sh` 让 CLI 和 MCP 共用一个持有者；WorkBuddy 请连本仓库 MCP，不要直连 automaat。
 - 例图匹配动全局和分区色调，不复制构图。
 - 直方图 suggestions 在夜景 / 青色上会误报——当证据，不当处方。
-- 没有画笔、修复、污点；AI 天空/主体/渐变蒙版需要插件 Reload 后才认。
-- `apply_auto_tone_photo` 是 Classic Auto（8 个滑块），同样要 Reload。
+- 没有画笔、修复、污点。
+- **对象蒙版：** `objects` 打开「选择对象」。SDK 不能按名字选「床」——要用户在图上点。点之前不会落成新组。
+- **景观水面：** 没有可靠的 `water` 子类型。请用户勾选「水面」，再创建。不要替用户点 Lightroom 界面。
+- 蒙版滑块默认写**最后一组**；指定组要在插件调用里传 `group_index`。MCP 的 `set_mask_settings_photo` 目前还不接收 `group_index`。
+- 局部滑块是 0–1（`0.28` = 界面 +28）。局部曝光是 EV。`list_masks_photo` 在现装插件上几乎不返回内容。
+- AI 蒙版、渐变、Auto 装完插件后要 **Reload**。`apply_auto_tone_photo` 是 Classic Auto（8 个滑块）。
 
 ## 文档
 
